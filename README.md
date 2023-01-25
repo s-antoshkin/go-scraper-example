@@ -4,11 +4,9 @@
 - запись полученной информации в `csv-файл`.
 
 ## Requirements
----
 Go 1.19 or above.
 
 ## Installation
----
 ```
 git clone https://github.com/s-antoshkin/go-scraper-example
 cd go-scraper-example
@@ -16,13 +14,11 @@ go get -u
 ```
 
 ## Start the application
----
 ```
 go run .
 ```
 
 ## Packages used
----
 ```
 "encoding/csv"
 "fmt"
