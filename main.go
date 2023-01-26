@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 	"time"
 
@@ -84,12 +83,11 @@ func scraping(pages chan int, result chan []string) {
 				return
 			}
 			stringPrice := strings.TrimSpace(s.Find("div.product_price p.price_color").Text())
-			re := regexp.MustCompile(`\d+.\d+`)
-			price := re.Find([]byte(stringPrice))
+			price := strings.Replace(stringPrice, "£", "", 1)
 
 			available := strings.TrimSpace(s.Find("div.product_price p.instock").Text())
 
-			book := []string{title, fullURL, string(price), available}
+			book := []string{title, fullURL, price, available}
 			result <- book
 
 		})
