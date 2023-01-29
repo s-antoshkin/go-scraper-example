@@ -11,7 +11,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-const BASE_URL = "http://books.toscrape.com/"
+const BASE_URL = "http://books.toscrape.com/catalogue/"
 
 func check(err error) {
 	if err != nil {
@@ -59,7 +59,7 @@ func main() {
 
 func scraping(pages chan int, result chan []string) {
 	for i := range pages {
-		res, err := http.Get(BASE_URL + fmt.Sprintf("catalogue/page-%d.html", i))
+		res, err := http.Get(BASE_URL + fmt.Sprintf("page-%d.html", i))
 		check(err)
 
 		if res.StatusCode > 400 {
