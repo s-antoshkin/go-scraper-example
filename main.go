@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -20,9 +21,12 @@ func check(err error) {
 }
 
 func main() {
+	var m sync.Mutex
+
 	pages := make(chan int, 50)
 	results := make(chan []string)
 	file, err := os.Create("books.csv")
+
 	check(err)
 	defer file.Close()
 
@@ -38,23 +42,25 @@ func main() {
 
 	go func() {
 		for i := 1; i <= cap(pages); i++ {
+			m.Lock()
 			pages <- i
+			m.Unlock()
 		}
 	}()
 
-	for i := 1; i <= 1000; i++ {
-		result := <-results
-
-		if err := writer.Write(result); err != nil {
-			fmt.Println(err)
+	for {
+		select {
+		case result := <-results:
+			if err := writer.Write(result); err != nil {
+				fmt.Println(err)
+			}
+		case <-time.After(1 * time.Second):
+			defer close(results)
+			defer close(pages)
+			fmt.Printf("End: %s", time.Since(start))
+			return
 		}
 	}
-
-	close(pages)
-	close(results)
-
-	fmt.Printf("End: %s", time.Since(start))
-
 }
 
 func scraping(pages chan int, result chan []string) {
@@ -89,7 +95,6 @@ func scraping(pages chan int, result chan []string) {
 
 			book := []string{title, fullURL, price, available}
 			result <- book
-
 		})
 
 		res.Body.Close()
